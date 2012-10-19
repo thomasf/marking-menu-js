@@ -5,7 +5,7 @@
  */
 
 // Extensions CSS support is hit-or-miss, so we set the important styles in JavaScript.
-function zeroMargins(element) {	
+function zeroMargins(element) {
 	element.style.left = element.style.right = element.style.top = element.style.left = '0px';
 	element.style.marginLeft = element.style.marginRight = element.style.marginTop = element.style.marginBottom = '0px';
 }
@@ -21,7 +21,7 @@ var markingMenu, markingMenuBackground, markingMenuLabel, markingMenuItems, high
 function drawMenu() {
 	if (markingMenu && markingMenu.parentNode)
 		markingMenu.parentNode.removeChild(markingMenu);
-	
+
 	markingMenu = document.createElement('div');
 	zeroMargins(markingMenu);
 	markingMenu.id = 'markingMenu';
@@ -29,7 +29,7 @@ function drawMenu() {
 	markingMenu.style.position = 'absolute';
 	markingMenu.style.width = markingMenu.style.height = menuDiameter;
 	markingMenuItems = [];
-	
+
 	markingMenuBackground = document.createElement('img');
 	zeroMargins(markingMenuBackground);
 	markingMenuBackground.src = hostAPI.getURL('common/images/background.png');
@@ -52,39 +52,39 @@ function drawMenu() {
 	markingMenuLabel.style.textAlign = 'center';
 	markingMenuLabel.style.color = '#5188BC';
 	markingMenu.appendChild(markingMenuLabel);
-	
+
 	highlightImage = document.createElement('img');
 	zeroMargins(highlightImage);
 	highlightImage.id = 'markingMenuHighlight';
 	highlightImage.src = hostAPI.getURL('common/images/highlight.png');
 	highlightImage.style.position = 'absolute';
 	highlightImage.style.left = highlightImage.style.top = '0px';
-	
+
 	var action, markingMenuItem, image;
 	for (var i = 0; i < actions.length; i++) {
 		markingMenuItem = markingMenuItems[i] = document.createElement('div');
 		action = actions[i];
 		actionImage = actionImages[i];
-		
+
 		zeroMargins(markingMenuItem);
-		
+
 		image  = document.createElement('img');
 		zeroMargins(image);
 		image.className = 'markingMenuImage';
 		image.title = image.alt = action;
-		
+
 		if (actionImage.indexOf('//' == -1))
-		 	actionImage = hostAPI.getURL(actionImage);
+			actionImage = hostAPI.getURL(actionImage);
 		image.src = actionImage;
-		
+
 		markingMenuItem.id = 'markingMenuItem' + String(i);
 		markingMenuItem.className = 'markingMenuItem';
 		markingMenuItem.style.position = 'absolute';
 		markingMenuItem.style.marginTop = markingMenuItem.style.marginLeft = String(-itemSize / 2) + 'px';
-		
+
 		markingMenuItem.style.left	= String(distanceToItems * Math.cos((i * 360 / actions.length - 90) * DEG_TO_RAD)) + 'px';
 		markingMenuItem.style.top	= String(distanceToItems * Math.sin((i * 360 / actions.length - 90) * DEG_TO_RAD)) + 'px';
-		
+
 		image.style.width = image.style.height = markingMenuItem.style.width = markingMenuItem.style.height = itemSize + 'px';
 
 		markingMenuItem.appendChild(image);
@@ -96,7 +96,7 @@ window.addEventListener(MarkingMenuEvent.VARIABLES_INITIALIZED, drawMenu);
 window.addEventListener(MarkingMenuEvent.VARIABLES_INITIALIZED, blockDefaultMouseEvents);
 addEventListener('mousedown', onMouseDown);
 
-function blockDefaultMouseEvents() {	
+function blockDefaultMouseEvents() {
 	if (triggerButton == RIGHT_MOUSE)
 		addEventListener('contextmenu', blockContextMenu);
 }
@@ -111,9 +111,9 @@ function detectHoverInTarget(event) {
 }
 
 function detectHoverInElement(element) {
-	if (element.getElementsByTagName) {		
+	if (element.getElementsByTagName) {
 		var a = element.getElementsByTagName('a');
-	
+
 		for (var i = 0; i < a.length; i++) {
 			a[i].addEventListener('mouseover', setHovering);
 			a[i].addEventListener('mouseout', releaseHovering);
@@ -133,8 +133,8 @@ function blockContextMenu(event) {
 	if (!hovering)
 		event.preventDefault();
 }
-	
-function showMenu() {	
+
+function showMenu() {
 	document.body.appendChild(markingMenu);
 
 	addEventListener('mousemove', onMouseMove);
@@ -163,17 +163,17 @@ function onHoverClickMouseMove(event) {
 	if (getDistance(event) >= 1/2 * distanceToItems) {
 		if (event.button == triggerButton)
 			showMenu();
-		
+
 		removeEventListener('mousemove', onHoverClickMouseMove);
 	}
 }
 
 function onMouseMove(event) {
 	var index = getIndexByMouseEvent(event);
-	
+
 	if (index == null) {
-		markingMenuLabel.innerHTML = ''; 
-		
+		markingMenuLabel.innerHTML = '';
+
 		if (highlightImage && highlightImage.parentNode)
 			highlightImage.parentNode.removeChild(highlightImage);
 	} else {
@@ -181,11 +181,11 @@ function onMouseMove(event) {
 			markingMenuItems[index].appendChild(highlightImage);
 
 			//convert camelCase to multiline string and display label
-			var label = actions[index].split('.').pop().replace( /(.)([A-Z])/g, function(match, first, last) { 
-				return first + '<br />' + last.toLowerCase(); 
-			}); 
+			var label = actions[index].split('.').pop().replace( /(.)([A-Z])/g, function(match, first, last) {
+				return first + '<br />' + last.toLowerCase();
+			});
 			label = label[0].toUpperCase() + label.substr(1);
-			markingMenuLabel.innerHTML = label; 
+			markingMenuLabel.innerHTML = label;
 		}
 	}
 }
@@ -193,10 +193,10 @@ function onMouseMove(event) {
 function onMouseUp(event) {
 	if (event.button == triggerButton) {
 		var index = getIndexByMouseEvent(event);
-		
+
 		if (index != null) {
 			var action = actions[index];
-			
+
 			var onMessageResponse = function(handledByBackgroundPage) {
 				if (!handledByBackgroundPage) {
 					// send the event to window, so other content scripts (like domActions) can react
@@ -207,12 +207,12 @@ function onMouseUp(event) {
 			}
 			hostAPI.sendRequest({'action': action}, onMessageResponse);
 		}
-		
+
 		if (markingMenu && markingMenu.parentNode)
 			markingMenu.parentNode.removeChild(markingMenu);
 
-		markingMenuLabel.innerHTML = ''; 
-		
+		markingMenuLabel.innerHTML = '';
+
 		if (highlightImage && highlightImage.parentNode)
 			highlightImage.parentNode.removeChild(highlightImage);
 
@@ -233,7 +233,7 @@ function getIndexByMouseEvent(event) {
 
 function getDistance(event) {
 	var delta = [(event.pageX - clickLocation[0]), (clickLocation[1] - event.pageY)];
-	
+
 	return Math.sqrt(delta[0] * delta[0] + delta[1] * delta[1]);
 }
 
@@ -241,10 +241,10 @@ function getAngle(event) {
 	// HTML's Y axis is inverted, so X' - X, but Y - Y'
 	var delta = [(event.pageX - clickLocation[0]), (clickLocation[1] - event.pageY)];
 	var angle = Math.atan(delta[0] / delta[1]) * RAD_TO_DEG;
-	
-	if (delta[1] < 0) 
+
+	if (delta[1] < 0)
 		angle += 180;
-		
+
 	return (360 + angle) % 360;
 }
 
